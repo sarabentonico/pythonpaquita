@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard de Bienestar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .animate-pulse {
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white p-4 border-b shadow-sm">
+      <div class="container mx-auto flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-gray-800">Panel de Bienestar</h1>
+        <div class="flex items-center gap-4">
+          <button
+            onclick="actualizarDatos()"
+            class="flex items-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+            <svg
+              class="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            Actualizar
+          </button>
+          <span class="font-semibold text-gray-700">Usuario</span>
+          <div
+            class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
+            U
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-6">
+      <!-- Selector de Vista -->
+      <div class="mb-6 bg-white rounded-lg shadow-md p-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold text-gray-800">Vista del Dashboard</h2>
+          <div class="flex gap-2">
+            <button
+              id="btn-vista-general"
+              onclick="cambiarVista('general')"
+              class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">
+              📊 Vista General
+            </button>
+            <button
+              id="btn-vista-detalle"
+              onclick="cambiarVista('detalle')"
+              class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+              🔍 Vista Detalle
+            </button>
+          </div>
+        </div>
+
+        <!-- Selector de Registro (solo visible en vista detalle) -->
+        <div id="selector-registro" class="mt-4 hidden">
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Seleccionar conversación:</label
+          >
+          <select
+            id="select-conversacion"
+            onchange="mostrarDetalleConversacion()"
+            class="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Cargando conversaciones...</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <!-- Termómetro de Felicidad -->
+        <div class="xl:col-span-1 bg-white rounded-lg shadow-md p-6">
+          <div class="mb-4">
+            <h2 class="text-xl font-bold flex items-center gap-2">
+              <span id="titulo-termometro">Termómetro de Felicidad</span>
+              <span class="text-2xl" id="emoji-termometro">😊</span>
+            </h2>
+            <p class="text-sm text-gray-600" id="resumen-termometro">
+              Cargando...
+            </p>
+            <!-- Info adicional para vista detalle -->
+            <div id="info-detalle-termometro" class="mt-2 hidden">
+              <p class="text-xs text-blue-600" id="fecha-detalle">Fecha: --</p>
+              <p class="text-xs text-green-600" id="puntuacion-detalle">
+                Puntuación: --/5
+              </p>
+            </div>
+          </div>
+
+          <!-- Termómetro Visual -->
+          <div class="flex items-center justify-center py-4">
+            <div
+              class="w-20 h-72 bg-gray-200 rounded-full flex flex-col-reverse overflow-hidden shadow-inner">
+              <div
+                id="level-muy-triste"
+                class="w-full h-1/5 flex items-center justify-center transition-all duration-500 bg-red-600 opacity-30"></div>
+              <div
+                id="level-triste"
+                class="w-full h-1/5 flex items-center justify-center transition-all duration-500 bg-orange-500 opacity-30"></div>
+              <div
+                id="level-normal"
+                class="w-full h-1/5 flex items-center justify-center transition-all duration-500 bg-yellow-400 opacity-30"></div>
+              <div
+                id="level-feliz"
+                class="w-full h-1/5 flex items-center justify-center transition-all duration-500 bg-lime-500 opacity-30"></div>
+              <div
+                id="level-muy-feliz"
+                class="w-full h-1/5 flex items-center justify-center transition-all duration-500 bg-green-500 opacity-100 scale-110">
+                <svg
+                  class="h-8 w-8 text-white animate-pulse"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+              </div>
+            </div>
+            <div class="ml-6 flex flex-col justify-around h-72">
+              <div class="flex items-center">
+                <div class="w-3 h-3 rounded-full mr-3 bg-green-500"></div>
+                <span class="font-bold text-blue-600 scale-105">Muy Feliz</span>
+              </div>
+              <div class="flex items-center text-gray-500">
+                <div class="w-3 h-3 rounded-full mr-3 bg-lime-500"></div>
+                <span>Feliz</span>
+              </div>
+              <div class="flex items-center text-gray-500">
+                <div class="w-3 h-3 rounded-full mr-3 bg-yellow-400"></div>
+                <span>Normal</span>
+              </div>
+              <div class="flex items-center text-gray-500">
+                <div class="w-3 h-3 rounded-full mr-3 bg-orange-500"></div>
+                <span>Triste</span>
+              </div>
+              <div class="flex items-center text-gray-500">
+                <div class="w-3 h-3 rounded-full mr-3 bg-red-600"></div>
+                <span>Muy Triste</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumen y Frase Destacada -->
+        <div class="xl:col-span-2 flex flex-col gap-6">
+          <!-- Resumen de Actividad -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4" id="titulo-resumen">
+              Resumen de Actividad
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                <svg
+                  class="h-10 w-10 text-blue-500 mr-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                  <p class="text-3xl font-bold" id="minutos-conectado">45</p>
+                  <p class="text-sm text-gray-600" id="label-minutos">
+                    Minutos conectado
+                  </p>
+                </div>
+              </div>
+              <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+                <svg
+                  class="h-10 w-10 text-green-500 mr-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.5a1.5 1.5 0 011.5 1.5V13a1.5 1.5 0 01-3 0V10.5A1.5 1.5 0 019 9a6 6 0 1112 0"></path>
+                </svg>
+                <div>
+                  <p class="text-3xl font-bold" id="estado-general">Feliz</p>
+                  <p class="text-sm text-gray-600" id="label-estado">
+                    Estado de ánimo general
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Estadísticas adicionales para vista detalle -->
+            <div id="estadisticas-detalle" class="mt-4 hidden">
+              <div class="border-t pt-4">
+                <h3 class="text-sm font-medium text-gray-700 mb-2">
+                  Información del registro:
+                </h3>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span class="text-gray-500">ID:</span>
+                    <span id="detalle-id" class="font-medium">--</span>
+                  </div>
+                  <div>
+                    <span class="text-gray-500">Fecha:</span>
+                    <span id="detalle-fecha" class="font-medium">--</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Frase Destacada -->
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-2">Frase Destacada</h2>
+            <p class="text-sm text-gray-600 mb-4" id="fecha-frase">Hoy</p>
+            <blockquote
+              class="border-l-4 border-blue-500 pl-4 italic text-gray-700">
+              <span class="text-2xl mr-2" id="emoji-frase">😊</span>
+              "<span id="texto-frase"
+                >Hoy la sesión fue muy buena. Hablamos de cosas que me hicieron
+                sentir acompañado y tranquilo.</span
+              >"
+            </blockquote>
+          </div>
+        </div>
+
+        <!-- Registro de Actividad -->
+        <div
+          class="md:col-span-2 xl:col-span-3 bg-white rounded-lg shadow-md p-6">
+          <h2 class="text-xl font-bold mb-4">Registro de Frases y Actividad</h2>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b">
+                  <th class="text-left py-2">Mensaje / Interacción</th>
+                  <th class="text-center py-2">Estado de Ánimo</th>
+                  <th class="text-center py-2">Recomendación</th>
+                  <th class="text-right py-2">Fecha</th>
+                </tr>
+              </thead>
+              <tbody id="tabla-actividades">
+                <tr class="border-b">
+                  <td class="py-3 font-medium">
+                    <span class="mr-2">😊</span>
+                    Cargando datos de actividad...
+                  </td>
+                  <td class="text-center py-3">
+                    <span
+                      class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                      >😊 Feliz</span
+                    >
+                  </td>
+                  <td class="text-center py-3 text-sm text-gray-600">
+                    Cargando...
+                  </td>
+                  <td class="text-right py-3 text-gray-600">Hoy</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Status indicator -->
+    <div
+      id="status-api"
+      class="fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg">
+      <div class="flex items-center gap-2">
+        <div id="status-dot" class="w-3 h-3 rounded-full bg-yellow-500"></div>
+        <span id="status-text" class="text-sm font-medium">Conectando...</span>
+      </div>
+    </div>
+
+    <script>
+      // Configuración de la API
+      const API_BASE_URL = "http://localhost:8002";
+
+      // Estado de la aplicación
+      let isLoading = false;
+      let todosLosRegistros = [];
+      let vistaActual = "general";
+
+      // Variables globales para almacenar los datos
+      let datosTermometro;
+      let datosResumen;
+      let datosFrase;
+      let datosEstadisticas;
+
+      // Función para actualizar el indicador de estado
+      function updateStatus(status, message) {
+        const statusDot = document.getElementById("status-dot");
+        const statusText = document.getElementById("status-text");
+        const statusContainer = document.getElementById("status-api");
+
+        statusText.textContent = message;
+
+        switch (status) {
+          case "connected":
+            statusDot.className = "w-3 h-3 rounded-full bg-green-500";
+            statusContainer.className =
+              "fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg bg-green-100 text-green-800";
+            break;
+          case "error":
+            statusDot.className = "w-3 h-3 rounded-full bg-red-500";
+            statusContainer.className =
+              "fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg bg-red-100 text-red-800";
+            break;
+          case "loading":
+            statusDot.className =
+              "w-3 h-3 rounded-full bg-yellow-500 animate-pulse";
+            statusContainer.className =
+              "fixed bottom-4 right-4 px-4 py-2 rounded-lg shadow-lg bg-yellow-100 text-yellow-800";
+            break;
+        }
+      }
+
+      // Función para obtener datos de la API
+      async function obtenerDatos() {
+        if (isLoading) return;
+
+        try {
+          isLoading = true;
+          updateStatus("loading", "Actualizando datos...");
+
+          // Hacer todas las llamadas a la API en paralelo
+          const [termometro, resumen, frase, estadisticas] = await Promise.all([
+            fetch(`${API_BASE_URL}/termometro`),
+            fetch(`${API_BASE_URL}/resumen`),
+            fetch(`${API_BASE_URL}/frase_destacada`),
+            fetch(`${API_BASE_URL}/estadisticas_completas`),
+          ]);
+
+          if (!termometro.ok || !resumen.ok || !frase.ok || !estadisticas.ok) {
+            throw new Error("Error al cargar datos de la API");
+          }
+
+          datosTermometro = await termometro.json();
+          datosResumen = await resumen.json();
+          datosFrase = await frase.json();
+          datosEstadisticas = await estadisticas.json();
+
+          // Almacenar todos los registros para la vista detalle
+          todosLosRegistros = datosEstadisticas.conversaciones || [];
+
+          // Llenar el selector de registros
+          llenarSelectorRegistros();
+
+          // Actualizar la vista con los datos cargados
+          actualizarVista();
+
+          updateStatus(
+            "connected",
+            `✅ Datos actualizados - ${new Date().toLocaleTimeString()}`
+          );
+        } catch (error) {
+          console.error("Error al obtener datos:", error);
+          updateStatus("error", `❌ Error: ${error.message}`);
+
+          // Mostrar datos de ejemplo si hay error
+          mostrarDatosEjemplo();
+        } finally {
+          isLoading = false;
+        }
+      }
+
+      function llenarSelectorRegistros() {
+        const selector = document.getElementById("selector-registro");
+        selector.innerHTML =
+          '<option value="">Selecciona una conversación...</option>';
+
+        todosLosRegistros.forEach((registro, index) => {
+          const option = document.createElement("option");
+          option.value = index;
+          option.textContent = `${registro.id_conversacion} - ${registro.fecha} (${registro.sentimiento})`;
+          selector.appendChild(option);
+        });
+      }
+
+      function cambiarVista() {
+        const selector = document.getElementById("vista-selector");
+        vistaActual = selector.value;
+
+        if (vistaActual === "general") {
+          document.getElementById("selector-registros").classList.add("hidden");
+          document
+            .getElementById("estadisticas-detalle")
+            .classList.add("hidden");
+          document.getElementById("titulo-resumen").textContent =
+            "Resumen de Actividad";
+          document.getElementById("label-minutos").textContent =
+            "Minutos conectado";
+          document.getElementById("label-estado").textContent =
+            "Estado de ánimo general";
+          actualizarVistaGeneral();
+        } else {
+          document
+            .getElementById("selector-registros")
+            .classList.remove("hidden");
+          document
+            .getElementById("estadisticas-detalle")
+            .classList.remove("hidden");
+          document.getElementById("titulo-resumen").textContent =
+            "Detalle del Registro";
+          document.getElementById("label-minutos").textContent =
+            "Minutos en esta conversación";
+          document.getElementById("label-estado").textContent =
+            "Estado de ánimo detectado";
+          // Si hay un registro seleccionado, mostrarlo
+          const selectorRegistro = document.getElementById("selector-registro");
+          if (selectorRegistro.value) {
+            mostrarDetalleConversacion();
+          } else {
+            limpiarVistaDetalle();
+          }
+        }
+      }
+
+      function mostrarDetalleConversacion() {
+        const selectorRegistro = document.getElementById("selector-registro");
+        const indiceRegistro = parseInt(selectorRegistro.value);
+
+        if (isNaN(indiceRegistro) || !todosLosRegistros[indiceRegistro]) {
+          limpiarVistaDetalle();
+          return;
+        }
+
+        const registro = todosLosRegistros[indiceRegistro];
+
+        // Actualizar termómetro
+        document.getElementById("emoji-termometro").textContent =
+          registro.emoji || "😐";
+        document.getElementById("resumen-termometro").textContent =
+          registro.mensaje_bienestar || "Sin análisis disponible";
+
+        // Actualizar resumen de actividad
+        document.getElementById("minutos-conectado").textContent =
+          registro.minutos_conectado || "--";
+        document.getElementById("estado-general").textContent =
+          registro.sentimiento || "--";
+
+        // Actualizar frase destacada
+        document.getElementById("emoji-frase").textContent =
+          registro.emoji || "📝";
+        document.getElementById("texto-frase").textContent =
+          registro.texto || "Sin texto disponible";
+        document.getElementById("fecha-frase").textContent = formatearFecha(
+          registro.fecha
+        );
+
+        // Actualizar detalles
+        document.getElementById("detalle-id").textContent =
+          registro.id_conversacion || "--";
+        document.getElementById("detalle-fecha").textContent =
+          registro.fecha || "--";
+
+        // Actualizar termómetro visual según el sentimiento
+        const nivelTermometro = obtenerNivelDeTermometro(registro.sentimiento);
+        actualizarTermometro(nivelTermometro);
+
+        // Actualizar tabla con este registro específico
+        actualizarTablaRegistroIndividual(registro);
+      }
+
+      function obtenerNivelDeTermometro(sentimiento) {
+        if (!sentimiento) return "normal";
+
+        const sentimientoLower = sentimiento.toLowerCase();
+        if (
+          sentimientoLower.includes("muy") &&
+          sentimientoLower.includes("positivo")
+        )
+          return "muy-feliz";
+        if (
+          sentimientoLower.includes("positivo") ||
+          sentimientoLower.includes("feliz")
+        )
+          return "feliz";
+        if (
+          sentimientoLower.includes("muy") &&
+          sentimientoLower.includes("negativo")
+        )
+          return "muy-triste";
+        if (
+          sentimientoLower.includes("negativo") ||
+          sentimientoLower.includes("triste")
+        )
+          return "triste";
+        return "normal";
+      }
+
+      function actualizarTablaRegistroIndividual(registro) {
+        const tbody = document.getElementById("tabla-actividades");
+        tbody.innerHTML = `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 font-medium">
+                        <span class="mr-2">${registro.emoji || "📝"}</span>
+                        ${
+                          registro.texto
+                            ? registro.texto.substring(0, 80) + "..."
+                            : "Conversación registrada"
+                        }
+                    </td>
+                    <td class="text-center py-3">
+                        ${getBadgeHTML(registro.sentimiento)}
+                    </td>
+                    <td class="text-center py-3 text-sm text-gray-600">
+                        ${
+                          registro.mensaje_bienestar ||
+                          "Análisis completo disponible"
+                        }
+                    </td>
+                    <td class="text-right py-3 text-gray-600">
+                        ${formatearFecha(registro.fecha)}
+                    </td>
+                </tr>
+            `;
+      }
+
+      function limpiarVistaDetalle() {
+        document.getElementById("emoji-termometro").textContent = "😐";
+        document.getElementById("resumen-termometro").textContent =
+          "Selecciona una conversación para ver el análisis detallado.";
+        document.getElementById("minutos-conectado").textContent = "--";
+        document.getElementById("estado-general").textContent = "--";
+        document.getElementById("emoji-frase").textContent = "📝";
+        document.getElementById("texto-frase").textContent =
+          "Selecciona una conversación para ver el contenido.";
+        document.getElementById("fecha-frase").textContent = "";
+        document.getElementById("detalle-id").textContent = "--";
+        document.getElementById("detalle-fecha").textContent = "--";
+
+        // Limpiar tabla
+        const tbody = document.getElementById("tabla-actividades");
+        tbody.innerHTML = `
+                <tr><td colspan="4" class="text-center py-8 text-gray-500">
+                    <p>Selecciona una conversación para ver los detalles</p>
+                </td></tr>
+            `;
+
+        // Resetear termómetro
+        actualizarTermometro("normal");
+      }
+
+      function actualizarVistaGeneral() {
+        if (!datosTermometro || !datosResumen || !datosFrase) return;
+
+        // Actualizar termómetro
+        document.getElementById("emoji-termometro").textContent =
+          datosTermometro.emoji;
+        document.getElementById("resumen-termometro").textContent =
+          datosTermometro.mensaje_bienestar;
+
+        // Actualizar resumen de actividad
+        document.getElementById("minutos-conectado").textContent =
+          datosResumen.minutos_conectado_total;
+        document.getElementById("estado-general").textContent =
+          datosResumen.estado_general;
+
+        // Actualizar frase destacada
+        document.getElementById("emoji-frase").textContent =
+          datosFrase.emoji || "📝";
+        document.getElementById("texto-frase").textContent = datosFrase.frase;
+        document.getElementById("fecha-frase").textContent = formatearFecha(
+          datosFrase.fecha
+        );
+
+        // Actualizar termómetro visual
+        const nivelTermometro = obtenerNivelDeTermometro(
+          datosResumen.estado_general
+        );
+        actualizarTermometro(nivelTermometro);
+
+        // Actualizar tabla con actividades generales
+        if (datosEstadisticas && datosEstadisticas.conversaciones) {
+          actualizarTablaActividades(datosEstadisticas.conversaciones);
+        }
+      }
+
+      function actualizarVista() {
+        if (vistaActual === "general") {
+          actualizarVistaGeneral();
+        } else {
+          mostrarDetalleConversacion();
+        }
+      }
+
+      // Función para actualizar el termómetro visual
+      function actualizarTermometro(level) {
+        const levels = ["muy-triste", "triste", "normal", "feliz", "muy-feliz"];
+
+        levels.forEach((levelName) => {
+          const element = document.getElementById(`level-${levelName}`);
+          if (levelName === level) {
+            element.className = element.className.replace(
+              "opacity-30",
+              "opacity-100 scale-110"
+            );
+            element.innerHTML =
+              '<svg class="h-8 w-8 text-white animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>';
+          } else {
+            element.className = element.className.replace(
+              "opacity-100 scale-110",
+              "opacity-30"
+            );
+            element.innerHTML = "";
+          }
+        });
+      }
+
+      // Función para actualizar la tabla de actividades
+      function actualizarTablaActividades(actividades) {
+        const tbody = document.getElementById("tabla-actividades");
+
+        if (!actividades || actividades.length === 0) {
+          tbody.innerHTML = `
+                    <tr><td colspan="4" class="text-center py-8 text-gray-500">
+                        <p>No hay registros de actividad disponibles</p>
+                        <p class="text-sm mt-2">Los datos aparecerán aquí cuando se realicen análisis de sentimientos</p>
+                    </td></tr>
+                `;
+          return;
+        }
+
+        tbody.innerHTML = actividades
+          .slice(0, 5)
+          .map(
+            (actividad) => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 font-medium">
+                        <span class="mr-2">${actividad.emoji || "📝"}</span>
+                        ${
+                          actividad.texto
+                            ? actividad.texto.substring(0, 50) + "..."
+                            : "Conversación registrada"
+                        }
+                    </td>
+                    <td class="text-center py-3">
+                        ${getBadgeHTML(actividad.sentimiento)}
+                    </td>
+                    <td class="text-center py-3 text-sm text-gray-600">
+                        ${
+                          actividad.mensaje_bienestar
+                            ? actividad.mensaje_bienestar.substring(0, 30) +
+                              "..."
+                            : "Análisis disponible"
+                        }
+                    </td>
+                    <td class="text-right py-3 text-gray-600">
+                        ${formatearFecha(actividad.fecha)}
+                    </td>
+                </tr>
+            `
+          )
+          .join("");
+      }
+
+      // Función para generar badges HTML
+      function getBadgeHTML(mood) {
+        if (!mood)
+          return '<span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">Sin análisis</span>';
+
+        const moodLower = mood.toLowerCase();
+        if (moodLower.includes("positivo") || moodLower.includes("feliz")) {
+          return '<span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">😊 Positivo</span>';
+        } else if (
+          moodLower.includes("negativo") ||
+          moodLower.includes("triste")
+        ) {
+          return '<span class="px-2 py-1 bg-red-100 text-red-800 rounded-full text-sm">😔 Negativo</span>';
+        } else if (
+          moodLower.includes("neutral") ||
+          moodLower.includes("normal")
+        ) {
+          return '<span class="px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-sm">😐 Neutral</span>';
+        } else {
+          return `<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">${mood}</span>`;
+        }
+      }
+
+      // Función para formatear fechas
+      function formatearFecha(dateString) {
+        if (!dateString) return "Fecha no disponible";
+        try {
+          const date = new Date(dateString);
+          return date.toLocaleDateString("es-ES", {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          });
+        } catch {
+          return dateString;
+        }
+      }
+
+      // Función para mostrar datos de ejemplo si hay error
+      function mostrarDatosEjemplo() {
+        const datosEjemplo = {
+          termometro: {
+            emoji: "😊",
+            mensaje_bienestar:
+              "Muy positivo, con buena disposición y contenido alegre.",
+          },
+          resumen: {
+            minutos_conectado_total: 45,
+            estado_general: "Positivo",
+          },
+          frase_destacada: {
+            frase:
+              "Hoy la sesión fue muy buena. Hablamos de cosas que me hicieron sentir acompañado y tranquilo.",
+            emoji: "😊",
+            fecha: "2025-01-17",
+          },
+        };
+
+        datosTermometro = datosEjemplo.termometro;
+        datosResumen = datosEjemplo.resumen;
+        datosFrase = datosEjemplo.frase_destacada;
+        datosEstadisticas = { conversaciones: [] };
+
+        actualizarVista();
+      }
+
+      // Función para actualizar datos manualmente
+      function actualizarDatos() {
+        obtenerDatos();
+      }
+
+      // Inicializar la aplicación
+      document.addEventListener("DOMContentLoaded", function () {
+        obtenerDatos();
+
+        // Actualizar automáticamente cada 30 segundos
+        setInterval(obtenerDatos, 30000);
+      });
+    </script>
+  </body>
+</html>

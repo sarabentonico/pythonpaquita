@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  paquita-api:
+    build: .
+    env_file: .env
+    ports:
+      - "8002:8002"
+    restart: always
+    container_name: paquita-api
