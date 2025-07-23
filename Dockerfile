@@ -5,7 +5,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN pip install --no-cache-dir fastapi uvicorn pyairtable python-dotenv
+RUN pip install --no-cache-dir fastapi uvicorn pyairtable python-dotenv transformers
 
 EXPOSE 8002
 
