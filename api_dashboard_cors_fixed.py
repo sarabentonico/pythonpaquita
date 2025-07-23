@@ -15,6 +15,7 @@ import uvicorn
 # Ajusta el import según tu estructura real
 # (si el archivo está en el mismo directorio, funciona tal cual; si no, corrige la ruta)
 from airtable_utils import create_or_update_report
+from analyze_sentiment_airtable import analizar_conversaciones
 
 # Cargar variables de entorno
 load_dotenv()
@@ -88,6 +89,16 @@ class ConversacionCreate(BaseModel):
 # -----------------------------
 # RUTAS
 # -----------------------------
+@app.post("/analizar_conversaciones")
+async def analizar_conversaciones_endpoint():
+    """
+    Ejecuta el análisis de sentimientos sobre las conversaciones en Airtable y actualiza las columnas.
+    """
+    try:
+        analizar_conversaciones()
+        return {"success": True, "message": "Análisis completado y columnas actualizadas."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al analizar conversaciones: {str(e)}")
 @app.get("/")
 async def root():
     return {
