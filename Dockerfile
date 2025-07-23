@@ -5,7 +5,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN pip install --no-cache-dir fastapi uvicorn pyairtable python-dotenv transformers
+RUN pip install --no-cache-dir fastapi uvicorn pyairtable python-dotenv transformers torch
 
 EXPOSE 8002
 
